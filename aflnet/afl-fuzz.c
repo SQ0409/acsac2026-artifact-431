@@ -108,6 +108,7 @@
 #include <stdlib.h>
 
 static uint64_t dbg_json_hits    = 0;
+static uint64_t dbg_json_applied = 0;
 static uint64_t dbg_switch_hits  = 0;
 static uint64_t dbg_total_hits   = 0;
 static uint32_t dbg_log_interval = 100;  /* 默认每100次打印一次 */
@@ -127,8 +128,9 @@ static inline void dbg_maybe_log_branch_counts(void) {
     double json_pct   = dbg_total_hits ? (100.0 * (double)dbg_json_hits   / (double)dbg_total_hits) : 0.0;
     double switch_pct = dbg_total_hits ? (100.0 * (double)dbg_switch_hits / (double)dbg_total_hits) : 0.0;
     fprintf(stderr,
-            "[AFLNet-Probe] total=%" PRIu64 "  json=%" PRIu64 " (%.2f%%)  switch=%" PRIu64 " (%.2f%%)\n",
-            dbg_total_hits, dbg_json_hits, json_pct, dbg_switch_hits, switch_pct);
+            "[AFLNet-Probe] total=%" PRIu64 "  json=%" PRIu64 " (%.2f%%, applied=%" PRIu64 ")  switch=%" PRIu64 " (%.2f%%)\n",
+            dbg_total_hits, dbg_json_hits, json_pct, dbg_json_applied,
+            dbg_switch_hits, switch_pct);
   }
 }
 
@@ -7332,7 +7334,7 @@ havoc_stage:
 	      dbg_maybe_log_branch_counts();
 
 	      int result = apply_first_matching_rule(out_buf, temp_len);
-	      (void)result; /* 如果未使用返回值，避免编译告警 */
+	      if (result) dbg_json_applied++;
 
 	      continue;  // 跳过下面的 switch
 	    }

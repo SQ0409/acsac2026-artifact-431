@@ -1,0 +1,113 @@
+============================================================
+信令统计报告 - COMP (对比版本)
+生成时间: 2025-11-25 22:27:10
+============================================================
+
+[核心参数]
+msg: 57  (消息种类覆盖)
+
+[信令质量评估]
+
+📊 会话统计(方向连续视角):
+总请求会话数: 3799 (gNB -> AMF 会话)
+├─ ✅ 有响应会话: 1225会话
+├─ ❌ 错误指示(err_ind): 2573会话
+└─ ⏱ 无响应会话: 1会话
+
+📦 请求统计(基于 NGAP 会话 / 上下文):
+总请求数: 13326 (gNB -> AMF 包)
+├─ ✅ 有响应请求: 5289条
+├─ ⏱ 无响应请求: 1822条
+└─ ⚠ 上下文释放后仍发送的请求: 6215条
+
+🎯 成功率(请求级): 39.7%
+   (被核心网“理过”的请求 / 全部请求)
+📎 会话成功率(参考): 32.2%
+   (有响应会话 / 总请求会话)
+
+💡 说明:
+   - 请求级成功率更敏感地反映“发出去的信令有没有被当空气”
+   - 上下文释放后继续发送的请求会单独统计并视为失败
+
+[与BASE版本对比]
+PBE: +41  (BASE版本: 16)
+成功率变化(请求级): -59.4%  (BASE版本: 99.1%)
+
+[新增覆盖质量]
+新增信令种类: 41 种
+ENM(有效新增覆盖): 18 种
+├─ ✅ 有响应的新信令: amf_cfg_upd, amf_cfg_upd_req, amf_cfg_upd_res, amf_status_ind, amf_status_ind_req, connectionestablishmentindication_req, dl_non_ue_assoc_nrppa_trans_req, dl_ue_assoc_nrppa_trans_req, downlinkranearlystatustransfer, err_ind, loc_rpt_ctrl, loc_rpt_ctrl_res, retr_ue_info_req, timingsynchronisationstatus_res, trace_fail_ind, ue_radio_cap_info_ind_req, ue_tnla_bind_rel_req, ul_ran_early_status_trans_req
+└─ ⚠ 无响应/仅在异常上下文出现的新信令: amfconfigurationupdateacknowledge, amfcprelocation_ind, amfcprelocationindication_req, amfcprelocationindication_res, auth_rej, broadcastsessionrelease_req, cell_traffic_trace, cell_traffic_trace_req, deact_trace, deact_trace_req, dl_non_ue_assoc_nrppa_trans, dl_ran_status_trans, dl_ue_assoc_nrppa_trans, ho_cancel, loc_report, loc_rpt_fail_ind_req, ngresetacknowledge, overload_start, pdu_sess_res_mod_ind, pdu_sess_res_setup_req, pws_cancel_req, ue_ctx_rel_cmd, ul_nas_trans_req
+有效新增覆盖率: 43.9%  (18/41)
+
+[对比分析]
+✓ 相比BASE增加了 41 种消息覆盖
+⚠ 触发了 2573 个错误指示会话 (67.7%)
+  提示: 变异产生了核心网无法处理的消息
+⚠ 有 1 个会话未得到响应 (0.0%)
+  提示: 可能是鉴权失败或消息格式错误导致核心网忽略
+⚠ 成功率较低 (39.7%)
+  建议: 优化变异策略，提高有效变异比例
+
+[详细信令统计]
+一共有 57 种信令
+
+1. ul_nas_trans  5289次
+2. err_ind  2670次
+3. ue_radio_cap_info_ind  2200次
+4. ini_ue_mes  1832次
+5. init_ctx_setup_res  1797次
+6. reg_req  1776次
+7. sec_mode_comp  1732次
+8. auth_res  1687次
+9. reg_comp  1658次
+10. ng_setup_req  953次
+11. dl_nas_trans  773次
+12. ng_setup_res  286次
+13. auth_req  286次
+14. amf_cfg_upd_req  231次
+15. cfg_upd_cmd  204次
+16. reg_acc  204次
+17. sec_mode_cmd  204次
+18. init_ctx_setup_req  204次
+19. amf_cfg_upd  200次
+20. trace_fail_ind  153次
+21. pws_cancel_req  94次
+22. loc_rpt_ctrl  60次
+23. deact_trace  50次
+24. dl_ue_assoc_nrppa_trans_req  42次
+25. ue_ctx_rel_cmd  41次
+26. auth_rej  41次
+27. deact_trace_req  41次
+28. loc_rpt_ctrl_res  41次
+29. amf_status_ind_req  35次
+30. connectionestablishmentindication_req  20次
+31. retr_ue_info_req  20次
+32. amf_status_ind  19次
+33. cell_traffic_trace  12次
+34. overload_start  11次
+35. ho_cancel  11次
+36. amfconfigurationupdateacknowledge  10次
+37. ue_tnla_bind_rel_req  10次
+38. amfcprelocationindication_res  10次
+39. cell_traffic_trace_req  10次
+40. downlinkranearlystatustransfer  9次
+41. ul_nas_trans_req  9次
+42. dl_ran_status_trans  9次
+43. amfcprelocation_ind  9次
+44. timingsynchronisationstatus_res  9次
+45. pdu_sess_res_mod_ind  9次
+46. pdu_sess_res_setup_req  9次
+47. dl_non_ue_assoc_nrppa_trans_req  9次
+48. loc_rpt_fail_ind_req  9次
+49. amfcprelocationindication_req  2次
+50. dl_non_ue_assoc_nrppa_trans  1次
+51. ngresetacknowledge  1次
+52. ue_radio_cap_info_ind_req  1次
+53. loc_report  1次
+54. dl_ue_assoc_nrppa_trans  1次
+55. amf_cfg_upd_res  1次
+56. broadcastsessionrelease_req  1次
+57. ul_ran_early_status_trans_req  1次
+
+============================================================

@@ -63,3 +63,19 @@ The resulting binary is always written to `input/seed.bin`.
 The scripts in `analysis/` are intentionally separate from the minimum run. `capture_worker.py` and the coverage/state analyzers expect a reviewer-provided capture setup and write results under `output/`; no private IPs or credentials are embedded.
 
 Each subdirectory has a README describing its scope and dependencies.
+
+## F1 illustrative data
+
+`examples/f1/` contains a compact, sanitized evidence package for the F1
+workflow: baseline and comparison `message_stats` summaries plus the public
+NGSetupRequest seed. The full packet captures and private run logs are not
+included. The summaries are supplied for inspection and visualization of the
+reported message-coverage trend, not as a complete reproduction archive.
+
+For the live run, JSON-rule activity is printed as
+`[AFLNet-Probe] total=..., json=..., applied=..., switch=...`. `json / total`
+is the share of mutation decisions routed to the JSON branch; `applied` counts
+decisions for which the public selector matched and changed a field. Protocol/
+state coverage is evaluated separately from captured NGAP messages using the
+scripts in `analysis/` (for example, `message_stats_*.txt` and the state graph
+under `output/`).
