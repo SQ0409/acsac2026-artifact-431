@@ -30,6 +30,6 @@ artifacts = "input/seed.bin, output/ipsm.dot, output/fuzzer_stats, queue/crash/h
 
 [availability]
 license = "See aflnet/LICENSE and the notices in the source files"
-submitted_url = "REPLACE_WITH_PUBLIC_GITHUB_URL"
+submitted_url = "https://github.com/SQ0409/acsac2026-artifact-431"
 permanent_url = ""
 restricted_components = "The original private tool implementation and real subscriber credentials are not included. Sensitive values are replaced with compileable placeholders; reviewers should use their own Open5GS test profile."

@@ -7,7 +7,11 @@ if [ -f "$ROOT/config/local.env" ]; then
   . "$ROOT/config/local.env"
   set +a
 fi
-ENDPOINT="${SCTP_ENDPOINT:-sctp://127.0.0.1/38412}"
+if [ -z "${SCTP_ENDPOINT:-}" ]; then
+  echo "SCTP_ENDPOINT is not set. Copy config/config.example.env to config/local.env and set it to the Open5GS AMF NGAP listener." >&2
+  exit 2
+fi
+ENDPOINT="$SCTP_ENDPOINT"
 TARGET="${AFLNET_TARGET:-$ROOT/targets/sctp_send}"
 mkdir -p "$ROOT/input" "$ROOT/output"
 if [ ! -s "$ROOT/input/seed.bin" ]; then "$ROOT/seed-generator/generate_seed.sh"; fi

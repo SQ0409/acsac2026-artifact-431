@@ -58,9 +58,9 @@ int main(void) {
        - 必须 3 字节 BCD（MCC/MNC）
        - 同时也别忘了 IE#3 的 BroadcastPLMNItem 里还有一个 PLMN（可相同/不同）
     */
-    /* Public example PLMN (MCC 001 / MNC 01). Replace all three BCD bytes
-       with the PLMN configured in the reviewer's Open5GS instance. */
-    const uint8_t plmn[3] = {0x00, 0xF1, 0x10};
+    /* Public Open5GS example PLMN (MCC 999 / MNC 70). Replace all three BCD
+       bytes with the PLMN configured in the reviewer's Open5GS instance. */
+    const uint8_t plmn[3] = {0x99, 0xF9, 0x07};
     if (OCTET_STRING_fromBuf(&gnb->pLMNIdentity, (const char*)plmn, sizeof(plmn)) != 0) {
         fprintf(stderr, "set PLMNIdentity failed\n");
         return 1;
@@ -136,7 +136,7 @@ int main(void) {
        - 这里演示 1 个 BroadcastPLMNItem；要多个就循环新建 bitem 并 ADD
     */
     /* Broadcast PLMN; normally the same public test PLMN as above. */
-    const uint8_t plmn2[3] = {0x00, 0xF1, 0x10};
+    const uint8_t plmn2[3] = {0x99, 0xF9, 0x07};
     struct ASN_NGAP_BroadcastPLMNItem *bitem = calloc(1, sizeof(*bitem));
     if (!bitem) { perror("calloc BroadcastPLMNItem"); return 1; }
 
@@ -160,7 +160,10 @@ int main(void) {
         return 1;
     }
 
-    // ✅ 修复：sD 是 OPTIONAL 指针，必须先 calloc 再赋值
+    /* SD is optional. Keep it absent for compatibility with the default
+       Open5GS profile (which advertises SST=1 without an SD). To use an SD,
+       allocate sD and set its three bytes to the AMF's configured value. */
+    /*
     slice_item->s_NSSAI.sD = calloc(1, sizeof(OCTET_STRING_t));
     if (!slice_item->s_NSSAI.sD) { perror("calloc sD"); return 1; }
     const uint8_t sd_val[3] = {0x00, 0x00, 0x01};
@@ -168,6 +171,7 @@ int main(void) {
         fprintf(stderr, "set S-NSSAI.sD failed\n");
         return 1;
     }
+    */
 
     if(ASN_SEQUENCE_ADD(&bitem->tAISliceSupportList.list, slice_item) != 0) {
         fprintf(stderr, "ASN_SEQUENCE_ADD SliceSupportItem failed\n");
