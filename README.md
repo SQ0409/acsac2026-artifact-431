@@ -39,7 +39,7 @@ bash scripts/run_aflnet.sh
 
 On systems where AFLNet stops at `Pipe at the beginning of 'core_pattern'`, temporarily use `echo core | sudo tee /proc/sys/kernel/core_pattern` and rerun the command. This changes only crash-dump handling for the current boot.
 
-If the run reports `Connection refused` or `No server states have been detected`, check the endpoint first. Those messages mean that AFLNet could not establish SCTP communication; they are not caused by the mutation rule. Restart the AMF and compare `ss -lnp -A sctp` with `SCTP_ENDPOINT`. The artifact does not install or start Open5GS for the reviewer.
+If the run reports `Connection refused` or `No server states have been detected`, check the endpoint first. Those messages mean that AFLNet could not establish SCTP communication; they are not caused by the mutation rule. Restart the AMF and compare `ss -lnp -A sctp` with `SCTP_ENDPOINT`. The artifact does not install or start Open5GS for the reviewer. The released AFLNet core also guards the short-lived placeholder target during network cleanup; this prevents a zero-PID wait loop after a successful NGAP response.
 
 The initial seed is an NGSetupRequest. Its PLMN, TAC, SST, and optional SD must be compatible with the AMF's `guami`, `tai`, and `plmn_support` values. Edit the marked constants in `seed-generator/main.c`, regenerate the seed, and rerun the fuzzer when using a different Open5GS profile. A PLMN mismatch can result in an NGSetupFailure even when SCTP connectivity is correct.
 

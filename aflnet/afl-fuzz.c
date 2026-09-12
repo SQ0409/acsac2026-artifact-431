@@ -1370,12 +1370,20 @@ HANDLE_RESPONSES:
 
   if (likely_buggy && false_negative_reduction) return 0;
 
-  if (terminate_child && (child_pid > 0)) kill(child_pid, SIGTERM);
+  /* In network mode the target passed after `--` is often a short-lived
+     placeholder. run_target() reaps such a child and sets child_pid to 0.
+     Calling kill(0, 0) succeeds for the caller's process group, so the old
+     unguarded loop could spin forever after a successful NGAP exchange. */
+  if (terminate_child && child_pid > 0) {
+    pid_t pid = child_pid;
+    kill(pid, SIGTERM);
 
-  //give the server a bit more time to gracefully terminate
-  while(1) {
-    int status = kill(child_pid, 0);
-    if ((status != 0) && (errno == ESRCH)) break;
+    /* Give a still-running target a short grace period, but never block the
+       fuzzer indefinitely if it ignores SIGTERM. */
+    for (unsigned int i = 0; i < 1000; ++i) {
+      if (kill(pid, 0) != 0 && errno == ESRCH) break;
+      usleep(1000);
+    }
   }
 
   return 0;
