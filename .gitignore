@@ -1,0 +1,10 @@
+*.o
+aflnet/afl-fuzz
+targets/dummy
+targets/sctp_send
+seed-generator/encode_ngsetup
+seed-generator/asn/**/*.o
+output/
+logs/
+config/local.env
+*.log

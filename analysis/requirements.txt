@@ -1,0 +1,4 @@
+# Optional post-run analysis dependencies (not needed for build/run)
+pyshark>=0.6
+networkx>=3.0
+pydot>=2.0
