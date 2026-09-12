@@ -8,3 +8,5 @@ output/
 logs/
 config/local.env
 *.log
+__pycache__/
+analysis/**/__pycache__/
