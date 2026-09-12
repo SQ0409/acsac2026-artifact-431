@@ -26,7 +26,7 @@ seed_generation = "bash seed-generator/generate_seed.sh"
 live_evaluation = "bash scripts/run_aflnet.sh"
 estimated_offline_build = "1-5 minutes on a typical 2-core VM; generated ASN.1 sources may take longer"
 estimated_live_smoke = "A few minutes, excluding Open5GS installation and configuration"
-artifacts = "input/seed.bin, output/ipsm.dot, output/fuzzer_stats, queue/crash/hang data"
+artifacts = "input/seed.bin, examples/f1/, output/ipsm.dot, output/fuzzer_stats, queue/crash/hang data"
 
 [availability]
 license = "See aflnet/LICENSE and the notices in the source files"
