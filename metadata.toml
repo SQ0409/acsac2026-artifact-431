@@ -1,5 +1,4 @@
 name = "ACSAC 2026 #431"
-version = "1.0"
 description = "Public evaluation package containing the NGAP execution workflow, one knowledge-guided mutation rule, and a reproducible NGSetupRequest seed generator. Some original implementation details are withheld for confidentiality; the released package provides a runnable evaluation workflow and sanitized example parameters."
 
 [software]
