@@ -1,35 +1,34 @@
-name = "ACSAC 2026 #431 NGAP knowledge-guided fuzzing artifact"
+name = "ACSAC 2026 #431"
 version = "1.0"
-description = "Public evaluation package containing the AFLNet-based NGAP execution workflow, one knowledge-guided mutation rule, and a reproducible NGSetupRequest seed generator. Some original implementation details are withheld for confidentiality; the released package provides a runnable evaluation workflow and sanitized example parameters."
+description = "Public evaluation package containing the NGAP execution workflow, one knowledge-guided mutation rule, and a reproducible NGSetupRequest seed generator. Some original implementation details are withheld for confidentiality; the released package provides a runnable evaluation workflow and sanitized example parameters."
 
 [software]
-os = "Linux (Ubuntu 20.04/22.04 recommended; other modern Linux distributions may work)"
+os = "Linux Ubuntu 20.04/22.04"
 architecture = "x86_64"
-compiler = "GCC 9 or newer"
-python = "Python 3.8 or newer (optional analysis helpers only)"
+compiler = "GCC 9"
+python = "Python 3.8"
 cuda = "Not required"
 build_dependencies = "build-essential, libssl-dev, xxd"
 optional_analysis_dependencies = "pyshark, networkx, pydot; tshark is required by pyshark"
-external_system = "Open5GS AMF configured with an SCTP/NGAP endpoint is required only for the live network evaluation; it is not bundled in this artifact."
+external_system = "Open5GS AMF configured with an SCTP/NGAP endpoint is required only for the live network evaluation"
 
 [hardware]
 cpu = "x86_64, 2 or more cores recommended"
 ram = "4 GB minimum for the offline build; 8 GB or more recommended when running Open5GS and packet capture"
 gpu = "Not required"
 disk = "At least 2 GB free space for sources and build products; additional space is needed for fuzzing output"
-network = "SCTP connectivity between the artifact host and the reviewer's Open5GS AMF for live evaluation"
+network = "SCTP connectivity between the artifact host and the reviewer's AMF for live evaluation"
 
 [execution]
 offline_validation = "bash scripts/validate.sh"
 build = "bash scripts/build.sh"
 seed_generation = "bash seed-generator/generate_seed.sh"
 live_evaluation = "bash scripts/run_NGeniusFuzz.sh"
-estimated_offline_build = "1-5 minutes on a typical 2-core VM; generated ASN.1 sources may take longer"
+estimated_offline_build = "1-5 minutes on a typical 2-core VM"
 estimated_live_smoke = "A few minutes, excluding Open5GS installation and configuration"
 artifacts = "input/seed.bin, examples/f1/, output/ipsm.dot, output/fuzzer_stats, queue/crash/hang data"
 
 [availability]
 license = "See aflnet/LICENSE and the notices in the source files"
 submitted_url = "https://github.com/SQ0409/acsac2026-artifact-431"
-permanent_url = ""
-restricted_components = "The original private tool implementation and real subscriber credentials are not included. Sensitive values are replaced with compileable placeholders; reviewers should use their own Open5GS test profile."
+restricted_components = "The original private tool implementation and real subscriber credentials are not included. Sensitive values are replaced with compileable placeholders; reviewers should use their own test profile."
