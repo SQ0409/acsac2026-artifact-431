@@ -35,5 +35,5 @@ format.
 `amf_transitions_clean.json`; the graph is deployment-specific and is not
 bundled. `coverage_analyzer.py` and `visualize_coverage.py` therefore require
 the corresponding transition/report files when a reviewer wants transition
-coverage. This optional analysis is separate from the AFLNet run and from the
+coverage. This optional analysis is separate from the NGeniusFuzz run and from the
 JSON mutation counters printed by the fuzzer.
