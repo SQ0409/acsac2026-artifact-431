@@ -111,7 +111,7 @@ static uint64_t dbg_json_hits    = 0;
 static uint64_t dbg_json_applied = 0;
 static uint64_t dbg_switch_hits  = 0;
 static uint64_t dbg_total_hits   = 0;
-static uint32_t dbg_log_interval = 100;  /* 默认每100次打印一次 */
+static uint32_t dbg_log_interval = 100;  
 
 #ifndef likely
 #  ifdef __GNUC__
@@ -134,7 +134,7 @@ static inline void dbg_maybe_log_branch_counts(void) {
   }
 }
 
-/* 可选：在初始化阶段（比如 main/init_fuzzing 里）放入这段，允许用环境变量调整打印周期 */
+
 static void dbg_init_probe_from_env(void) {
   const char* s = getenv("AFLNET_BRANCH_PROBE_EVERY");
   if (s && *s) {
@@ -476,7 +476,7 @@ static u8 *ext_target_sock     = NULL;
 
 //PART -Z 0
 
-//在afl-fuzz简短.c中添加外部变量声明
+
 extern int g_knowledge_on;
 extern int g_in_fuzzing; 
 extern int g_rule_count;
@@ -7327,8 +7327,8 @@ havoc_stage:
 	  for (i = 0; i < use_stacking; i++) {
 
 	    //PART -Z 5
-	    /* 方案3: 独立的JSON概率控制 */
-	    if (g_knowledge_on && UR(100) < 15) {  // 实际是 15% 概率
+	    
+	    if (g_knowledge_on && UR(100) < 15) {  
 	      dbg_json_hits++;
 	      dbg_total_hits++;
 	      dbg_maybe_log_branch_counts();
@@ -7336,465 +7336,26 @@ havoc_stage:
 	      int result = apply_first_matching_rule(out_buf, temp_len);
 	      if (result) dbg_json_applied++;
 
-	      continue;  // 跳过下面的 switch
+	      continue;  
 	    }
 	    // PART -Z 5 END
 
-	    /* 落不到上面的 continue 就会进入 switch 分支 */
+	    
 	    dbg_switch_hits++;
 	    dbg_total_hits++;
 	    dbg_maybe_log_branch_counts();
 
-	    switch (UR(15 + 2 + (region_level_mutation ? 4 : 0))) {
+	    switch (UR(2)) {
 
+      case 0:
+        FLIP_BIT(out_buf, UR(temp_len << 3));
+        break;
 
-	case 0:
+      case 1:
+        out_buf[UR(temp_len)] = interesting_8[UR(sizeof(interesting_8))];
+        break;
 
-          /* Flip a single bit somewhere. Spooky! */
-
-          FLIP_BIT(out_buf, UR(temp_len << 3));
-          break;
-
-        case 1:
-
-          /* Set byte to interesting value. */
-
-          out_buf[UR(temp_len)] = interesting_8[UR(sizeof(interesting_8))];
-          break;
-
-        case 2:
-
-          /* Set word to interesting value, randomly choosing endian. */
-
-          if (temp_len < 2) break;
-
-          if (UR(2)) {
-
-            *(u16*)(out_buf + UR(temp_len - 1)) =
-              interesting_16[UR(sizeof(interesting_16) >> 1)];
-
-          } else {
-
-            *(u16*)(out_buf + UR(temp_len - 1)) = SWAP16(
-              interesting_16[UR(sizeof(interesting_16) >> 1)]);
-
-          }
-
-          break;
-
-        case 3:
-
-          /* Set dword to interesting value, randomly choosing endian. */
-
-          if (temp_len < 4) break;
-
-          if (UR(2)) {
-
-            *(u32*)(out_buf + UR(temp_len - 3)) =
-              interesting_32[UR(sizeof(interesting_32) >> 2)];
-
-          } else {
-
-            *(u32*)(out_buf + UR(temp_len - 3)) = SWAP32(
-              interesting_32[UR(sizeof(interesting_32) >> 2)]);
-
-          }
-
-          break;
-
-        case 4:
-
-          /* Randomly subtract from byte. */
-
-          out_buf[UR(temp_len)] -= 1 + UR(ARITH_MAX);
-          break;
-
-        case 5:
-
-          /* Randomly add to byte. */
-
-          out_buf[UR(temp_len)] += 1 + UR(ARITH_MAX);
-          break;
-
-        case 6:
-
-          /* Randomly subtract from word, random endian. */
-
-          if (temp_len < 2) break;
-
-          if (UR(2)) {
-
-            u32 pos = UR(temp_len - 1);
-
-            *(u16*)(out_buf + pos) -= 1 + UR(ARITH_MAX);
-
-          } else {
-
-            u32 pos = UR(temp_len - 1);
-            u16 num = 1 + UR(ARITH_MAX);
-
-            *(u16*)(out_buf + pos) =
-              SWAP16(SWAP16(*(u16*)(out_buf + pos)) - num);
-
-          }
-
-          break;
-
-        case 7:
-
-          /* Randomly add to word, random endian. */
-
-          if (temp_len < 2) break;
-
-          if (UR(2)) {
-
-            u32 pos = UR(temp_len - 1);
-
-            *(u16*)(out_buf + pos) += 1 + UR(ARITH_MAX);
-
-          } else {
-
-            u32 pos = UR(temp_len - 1);
-            u16 num = 1 + UR(ARITH_MAX);
-
-            *(u16*)(out_buf + pos) =
-              SWAP16(SWAP16(*(u16*)(out_buf + pos)) + num);
-
-          }
-
-          break;
-
-        case 8:
-
-          /* Randomly subtract from dword, random endian. */
-
-          if (temp_len < 4) break;
-
-          if (UR(2)) {
-
-            u32 pos = UR(temp_len - 3);
-
-            *(u32*)(out_buf + pos) -= 1 + UR(ARITH_MAX);
-
-          } else {
-
-            u32 pos = UR(temp_len - 3);
-            u32 num = 1 + UR(ARITH_MAX);
-
-            *(u32*)(out_buf + pos) =
-              SWAP32(SWAP32(*(u32*)(out_buf + pos)) - num);
-
-          }
-
-          break;
-
-        case 9:
-
-          /* Randomly add to dword, random endian. */
-
-          if (temp_len < 4) break;
-
-          if (UR(2)) {
-
-            u32 pos = UR(temp_len - 3);
-
-            *(u32*)(out_buf + pos) += 1 + UR(ARITH_MAX);
-
-          } else {
-
-            u32 pos = UR(temp_len - 3);
-            u32 num = 1 + UR(ARITH_MAX);
-
-            *(u32*)(out_buf + pos) =
-              SWAP32(SWAP32(*(u32*)(out_buf + pos)) + num);
-
-          }
-
-          break;
-
-        case 10:
-
-          /* Just set a random byte to a random value. Because,
-             why not. We use XOR with 1-255 to eliminate the
-             possibility of a no-op. */
-
-          out_buf[UR(temp_len)] ^= 1 + UR(255);
-          break;
-
-        case 11 ... 12: {
-
-            /* Delete bytes. We're making this a bit more likely
-               than insertion (the next option) in hopes of keeping
-               files reasonably small. */
-
-            u32 del_from, del_len;
-
-            if (temp_len < 2) break;
-
-            /* Don't delete too much. */
-
-            del_len = choose_block_len(temp_len - 1);
-
-            del_from = UR(temp_len - del_len + 1);
-
-            memmove(out_buf + del_from, out_buf + del_from + del_len,
-                    temp_len - del_from - del_len);
-
-            temp_len -= del_len;
-
-            break;
-
-          }
-
-        case 13:
-
-          if (temp_len + HAVOC_BLK_XL < MAX_FILE) {
-
-            /* Clone bytes (75%) or insert a block of constant bytes (25%). */
-
-            u8  actually_clone = UR(4);
-            u32 clone_from, clone_to, clone_len;
-            u8* new_buf;
-
-            if (actually_clone) {
-
-              clone_len  = choose_block_len(temp_len);
-              clone_from = UR(temp_len - clone_len + 1);
-
-            } else {
-
-              clone_len = choose_block_len(HAVOC_BLK_XL);
-              clone_from = 0;
-
-            }
-
-            clone_to   = UR(temp_len);
-
-            new_buf = ck_alloc_nozero(temp_len + clone_len);
-
-            /* Head */
-
-            memcpy(new_buf, out_buf, clone_to);
-
-            /* Inserted part */
-
-            if (actually_clone)
-              memcpy(new_buf + clone_to, out_buf + clone_from, clone_len);
-            else
-              memset(new_buf + clone_to,
-                     UR(2) ? UR(256) : out_buf[UR(temp_len)], clone_len);
-
-            /* Tail */
-            memcpy(new_buf + clone_to + clone_len, out_buf + clone_to,
-                   temp_len - clone_to);
-
-            ck_free(out_buf);
-            out_buf = new_buf;
-            temp_len += clone_len;
-
-          }
-
-          break;
-
-        case 14: {
-
-            /* Overwrite bytes with a randomly selected chunk (75%) or fixed
-               bytes (25%). */
-
-            u32 copy_from, copy_to, copy_len;
-
-            if (temp_len < 2) break;
-
-            copy_len  = choose_block_len(temp_len - 1);
-
-            copy_from = UR(temp_len - copy_len + 1);
-            copy_to   = UR(temp_len - copy_len + 1);
-
-            if (UR(4)) {
-
-              if (copy_from != copy_to)
-                memmove(out_buf + copy_to, out_buf + copy_from, copy_len);
-
-            } else memset(out_buf + copy_to,
-                          UR(2) ? UR(256) : out_buf[UR(temp_len)], copy_len);
-
-            break;
-
-          }
-
-        /* Values 15 and 16 can be selected only if there are any extras
-           present in the dictionaries. */
-
-        case 15: {
-            if (extras_cnt + a_extras_cnt == 0) break;
-
-            /* Overwrite bytes with an extra. */
-
-            if (!extras_cnt || (a_extras_cnt && UR(2))) {
-
-              /* No user-specified extras or odds in our favor. Let's use an
-                 auto-detected one. */
-
-              u32 use_extra = UR(a_extras_cnt);
-              u32 extra_len = a_extras[use_extra].len;
-              u32 insert_at;
-
-              if (extra_len > temp_len) break;
-
-              insert_at = UR(temp_len - extra_len + 1);
-              memcpy(out_buf + insert_at, a_extras[use_extra].data, extra_len);
-
-            } else {
-
-              /* No auto extras or odds in our favor. Use the dictionary. */
-
-              u32 use_extra = UR(extras_cnt);
-              u32 extra_len = extras[use_extra].len;
-              u32 insert_at;
-
-              if (extra_len > temp_len) break;
-
-              insert_at = UR(temp_len - extra_len + 1);
-              memcpy(out_buf + insert_at, extras[use_extra].data, extra_len);
-
-            }
-
-            break;
-
-          }
-
-        case 16: {
-            if (extras_cnt + a_extras_cnt == 0) break;
-
-            u32 use_extra, extra_len, insert_at = UR(temp_len + 1);
-            u8* new_buf;
-
-            /* Insert an extra. Do the same dice-rolling stuff as for the
-               previous case. */
-
-            if (!extras_cnt || (a_extras_cnt && UR(2))) {
-
-              use_extra = UR(a_extras_cnt);
-              extra_len = a_extras[use_extra].len;
-
-              if (temp_len + extra_len >= MAX_FILE) break;
-
-              new_buf = ck_alloc_nozero(temp_len + extra_len);
-
-              /* Head */
-              memcpy(new_buf, out_buf, insert_at);
-
-              /* Inserted part */
-              memcpy(new_buf + insert_at, a_extras[use_extra].data, extra_len);
-
-            } else {
-
-              use_extra = UR(extras_cnt);
-              extra_len = extras[use_extra].len;
-
-              if (temp_len + extra_len >= MAX_FILE) break;
-
-              new_buf = ck_alloc_nozero(temp_len + extra_len);
-
-              /* Head */
-              memcpy(new_buf, out_buf, insert_at);
-
-              /* Inserted part */
-              memcpy(new_buf + insert_at, extras[use_extra].data, extra_len);
-
-            }
-
-            /* Tail */
-            memcpy(new_buf + insert_at + extra_len, out_buf + insert_at,
-                   temp_len - insert_at);
-
-            ck_free(out_buf);
-            out_buf   = new_buf;
-            temp_len += extra_len;
-
-            break;
-
-          }
-        /* Values 17 to 20 can be selected only if region-level mutations are enabled */
-
-        /* Replace the current region with a random region from a random seed */
-        case 17: {
-            u32 src_region_len = 0;
-            u8* new_buf = choose_source_region(&src_region_len);
-            if (new_buf == NULL) break;
-
-            //replace the current region
-            ck_free(out_buf);
-            out_buf = new_buf;
-            temp_len = src_region_len;
-            break;
-          }
-
-        /* Insert a random region from a random seed to the beginning of the current region */
-        case 18: {
-            u32 src_region_len = 0;
-            u8* src_region = choose_source_region(&src_region_len);
-            if (src_region == NULL) break;
-
-            if (temp_len + src_region_len >= MAX_FILE) {
-              ck_free(src_region);
-              break;
-            }
-
-            u8* new_buf = ck_alloc_nozero(temp_len + src_region_len);
-
-            memcpy(new_buf, src_region, src_region_len);
-
-            memcpy(&new_buf[src_region_len], out_buf, temp_len);
-
-            ck_free(out_buf);
-            ck_free(src_region);
-            out_buf = new_buf;
-            temp_len += src_region_len;
-            break;
-          }
-
-        /* Insert a random region from a random seed to the end of the current region */
-        case 19: {
-            u32 src_region_len = 0;
-            u8* src_region = choose_source_region(&src_region_len);
-            if (src_region == NULL) break;
-
-            if (temp_len + src_region_len >= MAX_FILE) {
-              ck_free(src_region);
-              break;
-            }
-
-            u8* new_buf = ck_alloc_nozero(temp_len + src_region_len);
-
-            memcpy(new_buf, out_buf, temp_len);
-
-            memcpy(&new_buf[temp_len], src_region, src_region_len);
-
-            ck_free(out_buf);
-            ck_free(src_region);
-            out_buf = new_buf;
-            temp_len += src_region_len;
-            break;
-          }
-
-        /* Duplicate the current region */
-        case 20: {
-            if (temp_len * 2 >= MAX_FILE) break;
-
-            u8* new_buf = ck_alloc_nozero(temp_len * 2);
-
-            memcpy(new_buf, out_buf, temp_len);
-
-            memcpy(&new_buf[temp_len], out_buf, temp_len);
-
-            ck_free(out_buf);
-            out_buf = new_buf;
-            temp_len += temp_len;
-            break;
-          }
-	
-      }
+    }
 
     }
 
@@ -9173,7 +8734,7 @@ int main(int argc, char** argv) {
 
 
 	//PART -Z 2
-	case 'Z': { /* knowledge rules JSON (v1: 等长变异 + 日志) */
+	case 'Z': { 
 	  extern void aflnet_set_knowledge_file(const char* path);
 	  aflnet_set_knowledge_file(optarg);
 	  break;
