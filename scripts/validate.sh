@@ -15,7 +15,7 @@ need gcc
 need python3
 need xxd
 
-echo "[1/5] Building AFLNet core, targets, and seed generator..."
+echo "[1/5] Building NGeniusFuzz core, targets, and seed generator..."
 make -C "$ROOT/aflnet" clean all
 make -C "$ROOT/targets" clean all
 make -C "$ROOT/seed-generator" clean all
@@ -37,7 +37,7 @@ echo "[4/5] Checking target executables..."
 test -x "$ROOT/targets/dummy"
 test -x "$ROOT/targets/sctp_send"
 
-echo "[5/5] Checking AFLNet command-line entry point..."
+echo "[5/5] Checking NGeniusFuzz command-line entry point..."
 # Some AFL builds use status 1 for the usage screen; either status still
 # proves that the executable started and parsed the command-line entry point.
 set +e

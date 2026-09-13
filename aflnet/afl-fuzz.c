@@ -128,7 +128,7 @@ static inline void dbg_maybe_log_branch_counts(void) {
     double json_pct   = dbg_total_hits ? (100.0 * (double)dbg_json_hits   / (double)dbg_total_hits) : 0.0;
     double switch_pct = dbg_total_hits ? (100.0 * (double)dbg_switch_hits / (double)dbg_total_hits) : 0.0;
     fprintf(stderr,
-            "[AFLNet-Probe] total=%" PRIu64 "  json=%" PRIu64 " (%.2f%%, applied=%" PRIu64 ")  switch=%" PRIu64 " (%.2f%%)\n",
+            "[NGeniusFuzz-Probe] total=%" PRIu64 "  json=%" PRIu64 " (%.2f%%, applied=%" PRIu64 ")  switch=%" PRIu64 " (%.2f%%)\n",
             dbg_total_hits, dbg_json_hits, json_pct, dbg_json_applied,
             dbg_switch_hits, switch_pct);
   }
@@ -857,7 +857,7 @@ struct queue_entry *choose_seed(u32 target_state_id, u8 mode)
         break;
     }
   } else {
-    PFATAL("AFLNet - the states hashtable has no entries for state %d", target_state_id);
+    PFATAL("NGeniusFuzz - the states hashtable has no entries for state %d", target_state_id);
   }
 
   return result;
@@ -1000,7 +1000,7 @@ void update_state_aware_variables(struct queue_entry *q, u8 dry_run)
 
     was_fuzzed_map[0][q->index] = 0; //Mark it as reachable but not fuzzed
   } else {
-    PFATAL("AFLNet - the states hashtable should always contain an entry of the initial state");
+    PFATAL("NGeniusFuzz - the states hashtable should always contain an entry of the initial state");
   }
 
   //Now update other states
@@ -1126,7 +1126,7 @@ static int send_via_ue(void)
   /* Ensure socket is world-accessible (UE runs as root via sudo) */
   chmod(ext_target_sock, 0777);
 
-  SAYF("[FUZZ] AFLnet listening on %s, timeout=%lds\n",
+  SAYF("[FUZZ] NGeniusFuzz listening on %s, timeout=%lds\n",
        ext_target_sock, exec_tmout / 1000);
 
   /* Set accept timeout so we detect hung UE */
@@ -1205,7 +1205,7 @@ static int send_via_ue(void)
   {
     static u64 fuzz_round = 0;
     fuzz_round++;
-    FILE *flog = fopen("/tmp/aflnet_fuzz.log", "a");
+    FILE *flog = fopen("/tmp/ngeniusfuzz_fuzz.log", "a");
     if (flog) {
       fprintf(flog, "[%llu] msgs=%u resp=%u ",
               fuzz_round, kl_messages->size, response_buf_size / 4);
@@ -1890,7 +1890,7 @@ static void add_to_queue(u8* fname, u32 len, u8 passed_det) {
     u32 byte_count = fread(buf, 1, len, fp);
     fclose(fp);
 
-    if (byte_count != len) PFATAL("AFLNet - Inconsistent file length '%s'", fname);
+    if (byte_count != len) PFATAL("NGeniusFuzz - Inconsistent file length '%s'", fname);
     q->regions = (*extract_requests)(buf, len, &q->region_count);
     ck_free(buf);
 
@@ -5219,7 +5219,7 @@ static void show_stats(void) {
 
   sprintf(tmp + banner_pad, "%s " cLCY VERSION cLGN
           " (%s)",  crash_mode ? cPIN "peruvian were-rabbit" :
-          cYEL "american fuzzy lop", use_banner);
+          cYEL "NGeniusFuzz", use_banner);
 
   SAYF("\n%s\n\n", tmp);
 
@@ -5711,7 +5711,7 @@ EXP_ST u8 common_fuzz_stuff(char** argv, u8* out_buf, u32 len) {
   // parse the out_buf into messages
   u32 region_count = 0;
   region_t *regions = (*extract_requests)(out_buf, len, &region_count);
-  if (!region_count) PFATAL("AFLNet Region count cannot be Zero");
+  if (!region_count) PFATAL("NGeniusFuzz region count cannot be zero");
 
   // update kl_messages linked list
   u32 i;
@@ -6282,7 +6282,7 @@ AFLNET_REGIONS_SELECTION:;
   u32 in_buf_size = 0;
   while (it != M2_next) {
     in_buf = (u8 *) ck_realloc (in_buf, in_buf_size + kl_val(it)->msize);
-    if (!in_buf) PFATAL("AFLNet cannot allocate memory for in_buf");
+  if (!in_buf) PFATAL("NGeniusFuzz cannot allocate memory for in_buf");
     //Retrieve data from kl_messages to populate the in_buf
     memcpy(&in_buf[in_buf_size], kl_val(it)->mdata, kl_val(it)->msize);
 
@@ -8415,7 +8415,7 @@ static void usage(u8* argv0) {
        "  -n            - fuzz without instrumentation (dumb mode)\n"
        "  -x dir        - optional fuzzer dictionary (see README)\n\n"
 
-       "Settings for network protocol fuzzing (AFLNet):\n\n"
+       "Settings for network protocol fuzzing (NGeniusFuzz):\n\n"
 
        "  -N netinfo    - server information (e.g., tcp://127.0.0.1/8554)\n"
        "  -P protocol   - application protocol to be tested (e.g., RTSP, FTP, DTLS12, DNS, SMTP, SSH, TLS)\n"
@@ -8434,10 +8434,10 @@ static void usage(u8* argv0) {
        //PART -Z 3 END
        
        "  -c cleanup    - name or full path to the server cleanup script (see README.md)\n"
-       "  -q algo       - state selection algorithm (See aflnet.h for all available options)\n"
-       "  -s algo       - seed selection algorithm (See aflnet.h for all available options)\n"
-       "  -b algo       - feedback type (See aflnet.h for all available options)\n"
-       "  -h algo       - seed schedule type (See aflnet.h for all available options)\n\n"
+       "  -q algo       - state selection algorithm (see the execution-core header)\n"
+       "  -s algo       - seed selection algorithm (see the execution-core header)\n"
+       "  -b algo       - feedback type (see the execution-core header)\n"
+       "  -h algo       - seed schedule type (see the execution-core header)\n\n"
 
        "Other stuff:\n\n"
 
